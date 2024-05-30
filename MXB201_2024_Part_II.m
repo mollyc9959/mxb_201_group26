@@ -56,5 +56,10 @@ end
 montage(faceArray) % show the first 20 eigenfaces in the filled out array
 
 %% Calculate coordinate vectors
+format short % for easier view of vectors
+facediff = diag(Sigma2); % singular values from the SVD 
+
+c = facediff(1:N, 1:N) * V(1, 1:N)';  % the coordinate vector for the first 20 eigenfaces
 
 %% Demonstrate rudimentary moustache detector
+
