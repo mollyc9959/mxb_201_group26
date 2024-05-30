@@ -62,4 +62,56 @@ facediff = diag(Sigma2); % singular values from the SVD
 c = facediff(1:N, 1:N) * V(1, 1:N)';  % the coordinate vector for the first 20 eigenfaces
 
 %% Demonstrate rudimentary moustache detector
+count = 0; % count of moustache
+mous_Num = zeros([1 1000]); % array for moustache faces
+display_matrix = repmat(I,[1 1 1000]); % matrix for display
 
+% Adjust these two variables to change the condition of being a
+% moustache face.
+
+% the bright scale is 0 to 255, generally a difference of 10 on average is
+% significant enough to show difference in brightness
+
+x = 5; % how much darker the moustache area is compared to the mean face
+        % increasing this variable filter out over-exposed faces
+
+y = 8; % how much darker the moustache area is compared to the rest of the face
+       % increasing this variable filter out faces that are darker then the
+       % mean face on average, but don't necessarily have a moustache
+       
+% loop through all 1000 faces
+for i = 1:1000
+    % variables that help decide whether a face has moustache
+    curr = double(reshape(A(:,i),[rows cols])); % current image in full size
+    mous_area = curr(125:145, 30:135); % moustach area of the current image
+    ms = size(mous_area);
+    mous_size = ms(1,1)*ms(1,2); % how many element is in the moustache area
+    mous_avg = sum(mous_area,'all')/mous_size;
+    mous_mean_diff = sum((double(mean_d(125:145, 30:135))),'all')/mous_size - mous_avg;
+    face_avg = sum(curr, "all")/M; % average brightness of the face
+    mous_face_diff = face_avg - mous_avg;
+
+    % Moustache should be darker then the mean face, so if avg_diff is
+    % larger then x, the face is considered to have moustache
+    
+    % Moustache area should be darker then the rest of the face on average,
+    % so if the moustache area is darker then the rest of the face on
+    % average by y, the face is considered to have moustache
+    
+    % These are and conditions, as it is common for the area under the nose
+    % to be darker then the rest of the face, and sometime the entire face
+    % can be darker then the mean face due to light conditions and skin color
+    
+    if mous_mean_diff > x && mous_face_diff > y
+        % a face that fits the requirement found, increment count and add to array
+        count = count + 1;
+        mous_Num(count) = i;
+    end
+end
+
+% move information from the mous_Num array to the display_matrix
+for i = 1:count
+    display_matrix(:,:,i) = (uint8(reshape(A(:,mous_Num(i)),[rows cols])));
+end
+
+montage(display_matrix(:,:,1:count)) % show all image that meet conditions
