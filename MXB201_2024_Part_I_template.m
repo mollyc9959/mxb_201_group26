@@ -50,14 +50,16 @@ for x = 1:X
 
         % MD
         sum_eigenvalues = sum(D_values);
-        MD(x,y) = sum_eigenvalues/3;
+        CMD = sum_eigenvalues/3;
+        MD(x,y) = CMD;
         
         % Fractional anistropy
         [D_e, throwaway] = eig(D);
-        FA_sq = ( (D_e(1)-D_e(2)).^2 + (D_e(2)-D_e(3)).^2 + (D_e(1)-D_e(3)).^2 ) / (2*(D_e(1).^2 + D_e(2).^2 + D_e(3).^2));
-        FA(x,y) = sqrt(FA_sq);  
+        FA_sq = ((D_values(1)-D_values(2))^2 + (D_values(2)-D_values(3))^2 + (D_values(1)-D_values(3))^2 ) / (2*(D_values(1).^2 + D_values(2).^2 + D_values(3).^2));
+        FA(x,y) = sqrt(FA_sq);          
 
         %PDD
+        
 
     end
 end
@@ -69,5 +71,5 @@ MD = MD.*threshold_mask;
 threshold_mask = FA >= 0.1*max(FA, [], 'all');  % setting a threshold of 10% of the max value
 FA = FA.*threshold_mask;
 
-figure, imshow(MD, [])
-figure, imshow(FA, [])
+%figure, imshow(MD, [])
+%figure, imshow(FA, [])
