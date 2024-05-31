@@ -14,10 +14,13 @@ PDD = nan(X, Y, 3); % principal diffusion direction
 
 % Any other initialisation needed here
 % Removing any negative values in the data
-S0 = max(S0, 0);
-S = max(S, 0);
+%S0 = max(S0, 0);
+%S = max(S, 0);
+
+S0 = abs(S0)
+
 A = [g(:,1).^2  g(:,2).^2  g(:,3).^2  2.*g(:,1).*g(:,2)  2.*g(:,1).*g(:,3)  2.*g(:,2).*g(:,3)];
-D = zeros(3,3);
+%D = zeros(3,3);
 
 %% Compute the diffusion tensor for each pixel
 for x = 1:X
@@ -27,22 +30,48 @@ for x = 1:X
         if ~mask(x, y), continue; end
         
         % Solving least squares problem
+        B = log(S(x,y,:)/S0(x,y))/(-b);
         % B is 1x1x64 but should be 1x64 
-        B = log(S(x,y,:)/S0(x,y));
         B = squeeze(B);        
         
-        D_i = B\A;
-        D_i()
-        
-        D = 
-
+        % Returns 1x6 matrix of important parts of D 
+        D_i = A\B;       
+        D_i = D_i';
         % Forming diffusion tensor
 
+        % Manually constructing D from important parts stored in D_i
+        %D(1,1) =  D_i(1,1); D(1,2) =  D_i(1,4); D(1,3) =  D_i(1,5);
+        %D(2,1) =  D_i(1,4); D(2,2) =  D_i(1,2); D(2,3) = D_i(1,6);
+        %D(3,1) =  D_i(1,5); D(3,2) =  D_i(1,6); D(3,3) =  D_i(1,3);
+
+        D = [D_i(1,1) D_i(1,4) D_i(1,5);
+            D_i(1,4) D_i(1,2) D_i(1,6); 
+            D_i(1,5) D_i(1,6) D_i(1,3)];
         % Finding eigenvalues and eigenvectors
+        D_values = eig(D);
+        D_values = sort(D_values, 'descend');
 
         % Calculating MD, FA and PDD
+        % MD
+        sum_eigenvalues = sum(D_values);
+        MD(x,y) = sum_eigenvalues/3;
+        
+        % Fractional anistropy
+        [D_e, throwaway] = eig(D);
+        FA_sq = ( (D_e(1)-D_e(2)).^2 + (D_e(2)-D_e(3)).^2 + (D_e(1)-D_e(3)).^2 ) / (2*(D_e(1).^2 + D_e(2).^2 + D_e(3).^2));
+        FA(x,y) = sqrt(FA_sq);  
+
+        %PDD
 
     end
 end
 
+threshold_mask = MD >= 0.1*max(MD, [], 'all');  % setting a threshold of 10% of the max value
+MD = MD.*threshold_mask;
+
+threshold_mask = FA >= 0.1*max(FA, [], 'all');  % setting a threshold of 10% of the max value
+FA = FA.*threshold_mask;
+
+figure, imshow(MD, [])
+figure, imshow(FA, [])
 %% Plot mean diffusivity, fractional anisotropy and principal diffusion direction maps
