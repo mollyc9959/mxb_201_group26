@@ -44,21 +44,25 @@ for x = 1:X
 
         % Finding eigenvalues and eigenvectors
         D_values = eig(D);
-        D_values = sort(D_values, 'descend');
+        
 
         % Calculating MD, FA and PDD
 
         % MD
         sum_eigenvalues = sum(D_values);
-        MD(x,y) = sum_eigenvalues/3;
+        CMD = sum_eigenvalues/3;
+        MD(x,y) = CMD;
         
         % Fractional anistropy
-        [D_e, throwaway] = eig(D);
-        %FA_sq = ((D_e(1)-D_e(2)).^2 + (D_e(2)-D_e(3)).^2 + (D_e(1)-D_e(3)).^2 ) / (2*(D_e(1).^2 + D_e(2).^2 + D_e(3).^2));
-        FA = sqrt((D_e(1) - ))/sqrt(D_e(1)^2 + D_e(2)^2 + D_e(3)^2)
-        FA(x,y) = sqrt(FA_sq);  
+        FA_sq = ((D_values(1)-D_values(2))^2 + (D_values(2)-D_values(3))^2 + (D_values(1)-D_values(3))^2 ) / (2*(D_values(1).^2 + D_values(2).^2 + D_values(3).^2));
+        FA(x,y) = sqrt(FA_sq);          
 
         %PDD
+        [D_e, throwaway] = eig(D);
+        [D_values, I] = sort(D_values, 'descend');
+        D_e = D_e(I);
+        principle_eigenvector = D_e(1);
+        
 
     end
 end
@@ -67,8 +71,7 @@ end
 threshold_mask = MD >= 0.1*max(MD, [], 'all');  % setting a threshold of 10% of the max value
 MD = MD.*threshold_mask;
 
-%figure, imshow(FA, [])
-threshold_mask = FA >= 0.5*max(FA, [], 'all');  % setting a threshold of 10% of the max value
+threshold_mask = FA >= 0.1*max(FA, [], 'all');  % setting a threshold of 10% of the max value
 FA = FA.*threshold_mask;
 
 figure, imshow(MD, [])

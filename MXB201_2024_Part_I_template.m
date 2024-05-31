@@ -44,7 +44,7 @@ for x = 1:X
 
         % Finding eigenvalues and eigenvectors
         D_values = eig(D);
-        D_values = sort(D_values, 'descend');
+        
 
         % Calculating MD, FA and PDD
 
@@ -54,22 +54,29 @@ for x = 1:X
         MD(x,y) = CMD;
         
         % Fractional anistropy
-        [D_e, throwaway] = eig(D);
         FA_sq = ((D_values(1)-D_values(2))^2 + (D_values(2)-D_values(3))^2 + (D_values(1)-D_values(3))^2 ) / (2*(D_values(1).^2 + D_values(2).^2 + D_values(3).^2));
         FA(x,y) = sqrt(FA_sq);          
 
         %PDD
-        
+        [D_e, throwaway] = eig(D);
+        principle_eigenvector_index = find(D_values >= max(D_values), 1);
+        principle_eigenvector = abs(D_e(:, principle_eigenvector_index));
 
-    end
+        LA = max(principle_eigenvector);
+        scaled_principle_eigenvector = principle_eigenvector/LA;
+        RGB_scaled = scaled_principle_eigenvector;
+
+        PDD(x,y,:) = (RGB_scaled*FA(x,y))';
+     end
 end
 
 %% Plot mean diffusivity, fractional anisotropy and principal diffusion direction maps
 threshold_mask = MD >= 0.1*max(MD, [], 'all');  % setting a threshold of 10% of the max value
 MD = MD.*threshold_mask;
 
-threshold_mask = FA >= 0.1*max(FA, [], 'all');  % setting a threshold of 10% of the max value
-FA = FA.*threshold_mask;
+%threshold_mask = FA >= 0.1*max(FA, [], 'all');  % setting a threshold of 10% of the max value
+%FA = FA.*threshold_mask;
 
-%figure, imshow(MD, [])
-%figure, imshow(FA, [])
+figure, imshow(MD, [])
+figure, imshow(FA, [])
+figure, imshow(PDD, [])
