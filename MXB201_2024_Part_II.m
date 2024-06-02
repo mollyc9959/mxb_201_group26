@@ -88,7 +88,7 @@ for i = 1:1000
     ms = size(mous_area);
     mous_size = ms(1,1)*ms(1,2); % how many element is in the moustache area
     mous_avg = sum(mous_area,'all')/mous_size;
-    mous_mean_diff = sum((double(mean_d(125:145, 30:135))),'all')/mous_size - mous_avg;
+    mous_mean_diff = sum((double(mean_face(125:145, 30:135))),'all')/mous_size - mous_avg;
     face_avg = sum(curr, "all")/M; % average brightness of the face
     mous_face_diff = face_avg - mous_avg;
 
