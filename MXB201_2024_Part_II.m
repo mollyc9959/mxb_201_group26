@@ -19,7 +19,7 @@ end
 mean_vector = mean(A,2); % return a column vector containing the mean of each row
 uint_mean_face = uint8(mean_vector); % convert to uint8 for grayscale image
 mean_face = reshape(uint_mean_face, rows, cols); % reshape for visualising 
-imshow(mean_face) % show image
+figure, imshow(mean_face) % show image
 
 %% Calculate mean-centred SVD
 format long
@@ -53,7 +53,7 @@ for i = 1:N
     faceArray(:,:,i) = reshape(eig_face(:,i),[rows cols]); % replace empty column with eigenface and reshape...
     % into size 192*168 for visualising purpose
 end
-montage(faceArray) % show the first 20 eigenfaces in the filled out array
+figure, montage(faceArray) % show the first 20 eigenfaces in the filled out array
 
 %% Calculate coordinate vectors
 format short % for easier view of vectors
@@ -115,4 +115,4 @@ for i = 1:count
     display_matrix(:,:,i) = (uint8(reshape(A(:,mous_Num(i)),[rows cols])));
 end
 
-montage(display_matrix(:,:,1:count)) % show all image that meet conditions
+figure, montage(display_matrix(:,:,1:count)) % show all image that meet conditions
