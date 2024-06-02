@@ -62,6 +62,7 @@ facediff = diag(Sigma2); % singular values from the SVD
 c = facediff(1:N, 1:N) * V(1, 1:N)';  % the coordinate vector for the first 20 eigenfaces
 
 %% Demonstrate rudimentary moustache detector
+mean_face = reshape(mean_vector, rows, cols); % reshape for moustache area
 count = 0; % count of moustache
 mous_Num = zeros([1 1000]); % array for moustache faces
 display_matrix = repmat(I,[1 1 1000]); % matrix for display
