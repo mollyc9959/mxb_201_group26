@@ -23,9 +23,9 @@ imshow(mean_face) % show image
 
 %% Calculate mean-centred SVD
 format long
-mean_d = double(mean_face); % convert to double
-[U,Sigma,V] = svd(mean_d, 'econ'); % reduced svd of the mean face matrix
-decom = (norm(mean_d - U*Sigma*V')); % difference is near zero
+meanCentred = A - mean_vector; % mean centering
+[U,Sigma,V] = svd(meanCentred, 'econ'); % reduced svd of the mean centred matrix
+decom = (norm(meanCentred - U*Sigma*V')); % difference is near zero
 ortho = U'*U; % still statisfies U'*U = I
 
 %% Visualise first 20 eigenfaces
@@ -41,7 +41,7 @@ for i = 1:N
 end
 
 first_N = double(B); % convert the uint8 matrix to double
-first_N = first_N - mean_vector; % subtract the mean face for difference
+first_N = first_N - mean_vector; % mean centering
 
 [U2,Sigma2,V2] = svd(first_N, 'econ'); % mean-centered SVD 
 Sigma2 = diag(Sigma2); % singular values vector
